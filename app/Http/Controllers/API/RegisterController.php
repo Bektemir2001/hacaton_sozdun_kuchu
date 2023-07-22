@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterController
 {
@@ -14,6 +15,7 @@ class RegisterController
             'email' => 'required|unique:users',
             'password' => 'required'
         ]);
+        $data['password'] = Hash::make($data['password']);
         $user = User::create($data);
         return response(['data' => $user]);
     }

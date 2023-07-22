@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController
 {
@@ -17,11 +19,19 @@ class LoginController
         $user = User::where('email', $data['email'])->first();
         if(!$user)
         {
-            return response(['message' => 'user not found'])->setStatusCode(404);
+            $errorResponse = [
+                'error' => 'Not found',
+                'message' => 'Запрошенные данные не найдены.',
+            ];
+            return response()->json($errorResponse, Response::HTTP_NOT_FOUND);
         }
-        if($user->password !== $data['password'])
+        if(!Hash::check($data['password'], $user->password))
         {
-            return response(['message' => 'wrong password'])->setStatusCode(422);
+            $errorResponse = [
+                'error' => 'Wrong password',
+                'message' => 'Wrong password',
+            ];
+            return response()->json($errorResponse, Response::HTTP_NOT_ACCEPTABLE);
         }
         return response(["data" => $user]);
     }
